@@ -14,22 +14,21 @@ class Player {
         ctx.beginPath();
         ctx.arc(this.x, this.y, 6, 0, Math.PI * 2);
         ctx.fill();
-        ctx.stroke();
     }
 
     drawVelocity() {
         ctx.beginPath();
         ctx.strokeStyle = '#80ffff';
         ctx.moveTo(this.x, this.y);
-        ctx.lineTo(this.x - this.vx / 4 * Math.sin(this.a), this.y - this.v / 4 * Math.cos(this.a));
+        ctx.lineTo(this.x+this.vx, this.y+this.vy);
         ctx.stroke();
     }
 
     drawAngle() {
         ctx.beginPath();
-        ctx.strokeStyle = "ff80ff";
+        ctx.strokeStyle = "#000000";
         ctx.moveTo(this.x, this.y);
-        ctx.lineTo(this.x + 20 * Math.sin(this.a), this.y + 20 * Math.cos(this.a));
+        ctx.lineTo(this.x + 6 * Math.sin(this.a), this.y + 6 * Math.cos(this.a));
         ctx.stroke();
     }
 
@@ -63,7 +62,6 @@ function loop() {
             ctx.clearRect(0, 0, 640, 480);
         }
 
-
         if (keyState['a']) { if (!keyState['d']) { player.vx += Math.cos(player.a); player.vy += Math.sin(player.a); } }
         else if (keyState['d']) { player.vx -= Math.cos(player.a); player.vy -= Math.sin(player.a); };
         if (keyState['w']) { if (!keyState['s']) { player.vx += Math.sin(player.a); player.vy += Math.cos(player.a); } }
@@ -74,9 +72,7 @@ function loop() {
         player.move();
         player.draw();
         player.drawAngle();
-        if (showVelocity) {
-            player.drawVelocity();
-        }
+        if (showVelocity) { player.drawVelocity(); }
     }, 1000 / fps);
 }
 
