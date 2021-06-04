@@ -1,11 +1,12 @@
-const angleSensitivity = 0.4;
+const angleSensitivity = 5;
 
 class Player {
-    constructor(xPos, yPos, velocity = 0, angle = 0) {
+    constructor(xPos, yPos, direction = 0) {
         this.x = xPos;
         this.y = yPos;
-        this.v = velocity;
-        this.a = angle;
+        this.vx = 0;
+        this.vy = 0;
+        this.a = direction;
         this.da = 0;
     }
     draw() {
@@ -13,23 +14,33 @@ class Player {
         ctx.beginPath();
         ctx.arc(this.x, this.y, 6, 0, Math.PI * 2);
         ctx.fill();
+        ctx.stroke();
     }
 
     drawVelocity() {
         ctx.beginPath();
-        ctx.strokeStyle = '#ffffff'
+        ctx.strokeStyle = '#80ffff';
         ctx.moveTo(this.x, this.y);
-        ctx.lineTo(this.x - (this.v/4 + 10) * Math.sin(this.a), this.y - (this.v/4 + 10) * Math.cos(this.a));
+        ctx.lineTo(this.x - this.vx / 4 * Math.sin(this.a), this.y - this.v / 4 * Math.cos(this.a));
+        ctx.stroke();
+    }
+
+    drawAngle() {
+        ctx.beginPath();
+        ctx.strokeStyle = "ff80ff";
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.x + 20 * Math.sin(this.a), this.y + 20 * Math.cos(this.a));
         ctx.stroke();
     }
 
     move() {
-        this.x -= this.v * Math.sin(this.a) / fps;
-        this.y -= this.v * Math.cos(this.a) / fps;
+        this.x += this.vx / fps;
+        this.y += this.vy / fps;
         this.a += this.da * angleSensitivity / fps;
 
-        this.v *= Math.pow(0.9, 1 / fps);
-        this.da *= Math.pow(0.9, 1 / fps);
+        this.vx *= res;
+        this.vy *= res;
+        this.da *= res;
 
         if (this.x < 0) { this.x += 640; }
         else if (this.x > 640) { this.x -= 640; }
@@ -39,8 +50,9 @@ class Player {
     }
 }
 
-let player = new Player(320, 400);
+let player = new Player(320, 400, Math.PI);
 let fps = 50;
+let res = Math.pow(0.9, 1 / fps);
 
 let showVelocity = false;
 let trail = false;
@@ -51,13 +63,17 @@ function loop() {
             ctx.clearRect(0, 0, 640, 480);
         }
 
-        if (keyState['a']) { player.da += 70/fps };
-        if (keyState['d']) { player.da -= 70/fps };
-        if (keyState['w']) { player.v += 70/fps };
-        if (keyState['s']) { player.v -= 70/fps };
+
+        if (keyState['a']) { if (!keyState['d']) { player.vx += Math.cos(player.a); player.vy += Math.sin(player.a); } }
+        else if (keyState['d']) { player.vx -= Math.cos(player.a); player.vy -= Math.sin(player.a); };
+        if (keyState['w']) { if (!keyState['s']) { player.vx += Math.sin(player.a); player.vy += Math.cos(player.a); } }
+        else if (keyState['s']) { player.vx -= Math.sin(player.a); player.vy -= Math.cos(player.a); };
+        if (keyState['ArrowLeft']) { if (!keyState['ArrowRight']) { player.da += (angleSensitivity / fps); } }
+        else if (keyState['ArrowRight']) { player.da -= (angleSensitivity / fps); }
 
         player.move();
         player.draw();
+        player.drawAngle();
         if (showVelocity) {
             player.drawVelocity();
         }
@@ -66,7 +82,7 @@ function loop() {
 
 loop();
 
-let keyState = { ArrowLeft: false, ArrowRight: false, ArrowUp: false, ArrowDown: false, w: false, a: false, s: false, d:false };
+let keyState = { ArrowLeft: false, ArrowRight: false, w: false, a: false, s: false, d: false };
 document.addEventListener('keydown', function (event) {
     if (event.key in keyState) {
         keyState[event.key] = true;
@@ -79,7 +95,7 @@ document.addEventListener('keyup', function (event) {
 })
 
 document.addEventListener('keypress', function (event) {
-    switch(event.key) {
+    switch (event.key) {
         case 'h':
             showVelocity = !showVelocity;
             break;
