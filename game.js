@@ -51,10 +51,10 @@ function loop() {
             ctx.clearRect(0, 0, 640, 480);
         }
 
-        if (keyState['ArrowLeft']) { player.da += 70/fps };
-        if (keyState['ArrowRight']) { player.da -= 70/fps };
-        if (keyState['ArrowUp']) { player.v += 70/fps };
-        if (keyState['ArrowDown']) { player.v -= 70/fps };
+        if (keyState['a']) { player.da += 70/fps };
+        if (keyState['d']) { player.da -= 70/fps };
+        if (keyState['w']) { player.v += 70/fps };
+        if (keyState['s']) { player.v -= 70/fps };
 
         player.move();
         player.draw();
@@ -66,7 +66,7 @@ function loop() {
 
 loop();
 
-let keyState = { ArrowLeft: false, ArrowRight: false, ArrowUp: false, ArrowDown: false };
+let keyState = { ArrowLeft: false, ArrowRight: false, ArrowUp: false, ArrowDown: false, w: false, a: false, s: false, d:false };
 document.addEventListener('keydown', function (event) {
     if (event.key in keyState) {
         keyState[event.key] = true;
